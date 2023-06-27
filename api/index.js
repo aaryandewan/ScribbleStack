@@ -1,4 +1,5 @@
 require("dotenv").config({ path: "../.env" });
+const User = require("./models/user");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -29,14 +30,20 @@ mongoose
 app.post("/api/register", (req, res) => {
   const { username, password } = req.body;
 
-  // Here, you can perform the necessary logic to register the user
-  // For simplicity, let's just return a success message with the registered user's data
-  const registeredUser = {
+  const newUser = new User({
     username,
     password,
-  };
+  });
 
-  res.json({ success: true, user: registeredUser });
+  newUser
+    .save()
+    .then((savedUser) => {
+      res.json({ success: true, user: savedUser });
+    })
+    .catch((error) => {
+      console.error("Error creating user:", error);
+      res.status(500).json({ success: false, error: "Failed to create user" });
+    });
 });
 
 const PORT = 5000; // Change it to the desired port number
